@@ -1,40 +1,40 @@
+local util = require("util")
+local http = require("http")
+local json = require("json")
 --- Returns some pre-installed information, such as version number, download address, local files, etc.
 --- If checksum is provided, vfox will automatically check it for you.
 --- @param ctx table
 --- @field ctx.version string User-input version
 --- @return table Version information
 function PLUGIN:PreInstall(ctx)
-    local version = ctx.version
-    local runtimeVersion = ctx.runtimeVersion
-    return {
-        --- Version number
-        version = "xxx",
-        --- remote URL or local file path [optional]
-        url = "xxx",
-        --- SHA256 checksum [optional]
-        sha256 = "xxx",
-        --- md5 checksum [optional]
-        md5 = "xxx",
-        --- sha1 checksum [optional]
-        sha1 = "xxx",
-        --- sha512 checksum [optional]
-        sha512 = "xx",
-        --- additional need files [optional]
-        addition = {
-            {
-                --- additional file name !
-                name = "xxx",
-                --- remote URL or local file path [optional]
-                url = "xxx",
-                --- SHA256 checksum [optional]
-                sha256 = "xxx",
-                --- md5 checksum [optional]
-                md5 = "xxx",
-                --- sha1 checksum [optional]
-                sha1 = "xxx",
-                --- sha512 checksum [optional]
-                sha512 = "xx",
-            }
+    local arg = ctx.version
+    local type = util:getOsTypeAndArch()
+    if arg == "stable" or arg == "dev" or arg == "beta" then
+        local resp, err = http.get({
+            url = util.LatestVersionURL:format(arg)
+        })
+        if err ~= nil or resp.status_code ~= 200 then
+            error("get version failed" .. err)
+        end
+        local latestVersion = json.decode(resp.body)
+        local version = latestVersion.version
+        local sha256Url = util.SHA256URL:format(arg, version, type.osType, type.archType)
+        local r = {
+            version = version,
+            url = util.DownloadURL:format(arg, version, type.osType, type.archType),
+            sha256 = util:extractChecksum(sha256Url)
         }
-    }
+        return r
+    else
+        local releases = self:Available({})
+        for _, info in ipairs(releases) do
+            if info.version == arg then
+                return {
+                    version = info.version,
+                    url = info.url,
+                    sha256 = util:extractChecksum(info.sha256)
+                }
+            end
+        end
+    end
 end
