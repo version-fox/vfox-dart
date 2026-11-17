@@ -55,18 +55,27 @@ local function listChildren(dir)
     else
         command = 'ls -1 "' .. dir:gsub('"', "") .. '" 2>/dev/null'
     end
-    local handle = io.popen(command)
-    if handle == nil then
+    -- Not every platform offers the same io.popen handle (on Windows vfox
+    -- replaces it). A failed listing only means fewer candidates; the direct
+    -- file checks below still find SDKs pointed at by DART_SDK or PATH.
+    local ok, entries = pcall(function()
+        local handle = io.popen(command, "r")
+        if handle == nil or type(handle.lines) ~= "function" then
+            return {}
+        end
+        local result = {}
+        for line in handle:lines() do
+            line = trim(line)
+            if line ~= "" and line ~= "." and line ~= ".." then
+                result[#result + 1] = dir .. "/" .. line
+            end
+        end
+        handle:close()
+        return result
+    end)
+    if not ok or type(entries) ~= "table" then
         return {}
     end
-    local entries = {}
-    for line in handle:lines() do
-        line = trim(line)
-        if line ~= "" and line ~= "." and line ~= ".." then
-            entries[#entries + 1] = dir .. "/" .. line
-        end
-    end
-    handle:close()
     return entries
 end
 
@@ -90,14 +99,17 @@ local function readVersion(dir)
     return nil
 end
 
+--- Checks for the launcher with io.open rather than a directory listing: it
+--- works the same on every platform and needs no child process.
 local function dartExecutable(dir)
-    local wanted = { dart = true }
+    local names = { "dart" }
     if onWindows() then
-        wanted = { ["dart.exe"] = true, ["dart.bat"] = true, ["dart.cmd"] = true }
+        names = { "dart.exe", "dart.bat", "dart.cmd" }
     end
-    for _, child in ipairs(listChildren(dir .. "/bin")) do
-        local name = (child:match("([^/\\]+)$") or child):lower()
-        if wanted[name] then
+    for _, name in ipairs(names) do
+        local file = io.open(dir .. "/bin/" .. name, "r")
+        if file ~= nil then
+            file:close()
             return true
         end
     end

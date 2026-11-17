@@ -37,6 +37,9 @@ local function addSdk(home, version, binNames)
     local root = norm(home)
     files[root .. "/version"] = version .. "\n"
     dirs[root .. "/bin"] = binNames
+    for _, name in ipairs(binNames) do
+        files[root .. "/bin/" .. name] = ""
+    end
     local parent = root:match("^(.*)/[^/]+$")
     if parent then
         local base = root:match("/([^/]+)$")
