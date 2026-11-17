@@ -6,6 +6,7 @@ What changed in each release, as a user notices it.
 
 ## Unreleased
 
+- Sort available versions by numeric precedence instead of string order, so `3.14.0` is listed before `3.9.4`. This also fixes `vfox install dart@latest` on vfox versions that resolve `@latest` from `Available`: it now picks the highest version by precedence instead of a lexicographic artifact such as `3.9.4`. For the newest stable build, use `dart@stable`.
 - Full bilingual documentation: English and Simplified Chinese READMEs (`README.md`, `README_CN.md`) plus documentation pages in both languages under `docs/` and `docs/zh-CN/`.
 - A changelog (this page).
 - Lua lint and format checks in the **Lint** workflow: `stylua --check .` and `lua-language-server --check . --checklevel=Warning`.

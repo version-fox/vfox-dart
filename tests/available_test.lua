@@ -27,7 +27,7 @@ local plugin = test.load({
         local channel = request.url:match("prefix=channels/(%a+)/release/")
         assert(channel, "unexpected version request: " .. request.url)
         local versions = {
-            stable = { "3.13.0", "3.14.0", "latest" },
+            stable = { "3.13.0", "3.14.0", "3.9.4", "3.9.12", "latest" },
             beta = { "3.15.0-beta.1", "latest" },
             dev = { "3.15.0-dev.1", "latest" },
         }
@@ -40,13 +40,18 @@ local plugin = test.load({
 })
 
 local result = plugin:Available({})
-assert(#result == 4, "expected 4 versions, got " .. #result)
+assert(#result == 6, "expected 6 versions, got " .. #result)
 
+-- 3.9.x must sort below 3.13+ even though "9" > "1" as a string, and 3.9.12
+-- must sort above 3.9.4. @latest relies on this order: vfox resolves it to
+-- the first entry returned by Available.
 local want = {
     { version = "3.15.0-dev.1", note = "dev" },
     { version = "3.15.0-beta.1", note = "beta" },
     { version = "3.14.0", note = "stable" },
     { version = "3.13.0", note = "stable" },
+    { version = "3.9.12", note = "stable" },
+    { version = "3.9.4", note = "stable" },
 }
 for i, expected in ipairs(want) do
     local got = result[i]
