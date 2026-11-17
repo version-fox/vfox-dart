@@ -71,13 +71,6 @@ Lint, license headers and the container tests are in [e2e.md](e2e.md#local-check
 
 A maintainer publishes from **Actions → Plugin → Run workflow** on the default branch, entering a stable plugin version without the `v` prefix. The shared [plugin-manifest-action](https://github.com/version-fox/plugin-manifest-action) updates `metadata.lua`, creates the version commit and tag, and publishes the ZIP and manifest in this repository. No local tag or extra release token is needed; pull requests run checks only. Pushing a version tag publishes too when `PLUGIN.version` already matches it. If publication fails, re-run the failed job to resume it. See the [shared workflow documentation](https://github.com/version-fox/plugin-manifest-action) for the package contract and first-rollout requirements.
 
-### After a release
-
-Documentation marks what is newer than the last release with "Unreleased" ("未发布" in Chinese). Once the release is out:
-
-1. Move those entries in [changes.md](changes.md) under the new version, with the release date, in both languages, and remove the remarks. Check with `grep -rn -i -e unreleased -e 未发布 docs README*`.
-2. Update the dated example version in [versions.md](versions.md) (3.14.0, released 2026-11-04) when the latest stable changes.
-
 ## Writing the docs
 
 English pages are in `docs/`, the Chinese ones in `docs/zh-CN/` under the same names (the Chinese README is `README_CN.md`), and each page starts with a link to the other language. A new page goes into the Documentation list of both READMEs. The hook contracts are described in [versions.md](versions.md), [platforms.md](platforms.md) and [link.md](link.md) (Detect). Nothing in CI checks the docs, so run any command you add yourself.

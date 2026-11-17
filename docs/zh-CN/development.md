@@ -71,13 +71,6 @@ cd tests/e2e && go test -short ./...
 
 维护者在默认分支上从 **Actions → Plugin → Run workflow** 发布，填入不带 `v` 前缀的稳定插件版本号。共享的 [plugin-manifest-action](https://github.com/version-fox/plugin-manifest-action) 会更新 `metadata.lua`、创建版本提交和标签，并在这个仓库里发布 ZIP 和 manifest。不需要本地打标签，也不需要额外的发布令牌；拉取请求只运行检查。如果 `PLUGIN.version` 已经和标签一致，推送版本标签也能发布。如果发布失败，重新运行失败的任务即可续跑。包的约定和首次接入的要求见[共享工作流文档](https://github.com/version-fox/plugin-manifest-action)。
 
-### 发布之后
-
-文档用“未发布”（英文是 "Unreleased"）标记比上一个版本更新的内容。发布完成后：
-
-1. 在两种语言的 [changes.md](changes.md) 里，把这些条目移到新版本标题下，加上发布日期，并去掉说明文字。可用 `grep -rn -i -e unreleased -e 未发布 docs README*` 检查。
-2. 当最新 stable 变化时，更新 [versions.md](versions.md) 里带日期的示例版本（3.14.0，发布于 2026-11-04）。
-
 ## 编写文档
 
 英文页面在 `docs/`，中文页面在 `docs/zh-CN/` 下使用相同的文件名（中文 README 是 `README_CN.md`），每个页面开头都有到另一种语言的链接。新增页面要加进两份 README 的文档列表里。各钩子的约定写在 [versions.md](versions.md)、[platforms.md](platforms.md) 和 [link.md](link.md)（Detect）里。CI 不检查文档内容，所以你新增的命令要自己跑一遍确认。
