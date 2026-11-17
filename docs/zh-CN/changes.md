@@ -6,6 +6,7 @@
 
 ## 未发布
 
+- 可用版本现在按数字版本号而非字符串顺序排序，`3.14.0` 会排在 `3.9.4` 之前。这也修复了通过 `Available` 解析 `@latest` 的 vfox 版本上的 `vfox install dart@latest`：现在按版本优先级取最高版本，而不是像 `3.9.4` 这样的字符串排序偶然结果。如需最新稳定版请使用 `dart@stable`。
 - 完整的中英双语文档：英文和简体中文的 README（`README.md`、`README_CN.md`），以及 `docs/` 和 `docs/zh-CN/` 下的双语文档页面。
 - 更新日志（即本页）。
 - **Lint** 工作流里的 Lua 格式与静态检查：`stylua --check .` 和 `lua-language-server --check . --checklevel=Warning`。

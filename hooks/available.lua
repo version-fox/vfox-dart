@@ -23,7 +23,7 @@ function PLUGIN:Available(ctx)
     util:parseReleases("dev", result)
     util:parseReleases("beta", result)
     table.sort(result, function(a, b)
-        return a.version > b.version
+        return util:compareVersions(a.version, b.version) > 0
     end)
     return result
 end

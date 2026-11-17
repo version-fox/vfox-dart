@@ -64,6 +64,75 @@ function util:extractVersions(str)
     return nil
 end
 
+--- Split a Dart version into its numeric release components and pre-release
+--- identifiers. `3.9.0-95.0.dev` becomes { 3, 9, 0 } and { "95", "0", "dev" }.
+local function splitVersion(version)
+    local core, pre = version:match("^([^%-]+)%-(.+)$")
+    if not core then
+        core, pre = version, nil
+    end
+    local numbers = {}
+    for number in core:gmatch("%d+") do
+        table.insert(numbers, tonumber(number))
+    end
+    local identifiers = {}
+    if pre then
+        for identifier in pre:gmatch("[^%.%-]+") do
+            table.insert(identifiers, identifier)
+        end
+    end
+    return numbers, identifiers
+end
+
+--- Compare two Dart versions by precedence, returning -1, 0 or 1.
+--- Numeric components are compared as numbers, so 3.14.0 is newer than 3.9.4;
+--- a release outranks its own pre-releases (3.15.0 > 3.15.0-dev.1).
+--- @param a string First version
+--- @param b string Second version
+--- @return number -1 when a is older, 0 when equal, 1 when a is newer
+function util:compareVersions(a, b)
+    local an, ai = splitVersion(a)
+    local bn, bi = splitVersion(b)
+    for i = 1, math.max(#an, #bn) do
+        local av, bv = an[i] or 0, bn[i] or 0
+        if av ~= bv then
+            return av < bv and -1 or 1
+        end
+    end
+    if #ai == 0 and #bi == 0 then
+        return 0
+    end
+    if #ai == 0 then
+        return 1
+    end
+    if #bi == 0 then
+        return -1
+    end
+    for i = 1, math.max(#ai, #bi) do
+        local x, y = ai[i], bi[i]
+        if not x then
+            return -1
+        end
+        if not y then
+            return 1
+        end
+        local xn, yn = tonumber(x), tonumber(y)
+        if xn and yn then
+            if xn ~= yn then
+                return xn < yn and -1 or 1
+            end
+        elseif xn then
+            -- Numeric identifiers have lower precedence than non-numeric ones.
+            return -1
+        elseif yn then
+            return 1
+        elseif x ~= y then
+            return x < y and -1 or 1
+        end
+    end
+    return 0
+end
+
 function util:getOsTypeAndArch()
     local osType = RUNTIME.osType
     local archType = RUNTIME.archType
