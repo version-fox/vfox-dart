@@ -13,6 +13,8 @@
 - **Test Plugin** 工作流里由 `vfox plugin test .` 运行的离线钩子测试（`tests/*_test.lua`）。
 - Linux 与 Windows 容器 E2E 测试套件（`tests/e2e/`）以及 **E2E** 工作流。
 - 仓库基础设施：`stylua.toml`、`.luarc.json`、`.gitattributes`（所有检出使用 LF）、`.dockerignore`、`.github/actionlint.yaml`，以及 `opencode.jsonc`（让本仓库里的 OpenCode 智能体会话不必确认就能执行 `git push *`、`gh pr create *` 和 `gh pr comment *`）。
+- 通过 `vfox link --detect dart` 发现本机已有的 Dart SDK（需要 vfox 1.1.0），包括 Flutter 自带的 SDK；详见 `docs/zh-CN/link.md`。
+- 离线的 Detect 测试，以及 Linux 和 Windows E2E 套件里的检测检查。
 
 ## 0.1.1
 

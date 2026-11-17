@@ -39,6 +39,16 @@ vfox uninstall dart@3.14.0
 
 `vfox search dart` lists the versions from all three channels, newest first; the note on each entry is the channel it came from (`stable`, `dev` or `beta`). See [versions.md](docs/versions.md).
 
+## Already installed SDKs
+
+If a Dart SDK is already on the machine — unpacked by hand, bundled with Flutter, or installed by another tool — `vfox link --detect dart` finds it (needs vfox 1.1.0 or later) and links it without downloading another copy. vfox lists what it found and links what you pick; `vfox link --detect -y dart` links everything. SDKs already installed or linked in vfox are skipped.
+
+```bash
+vfox link --detect dart
+```
+
+See [Using SDKs already on the machine](docs/link.md) for what is searched and how manual linking works.
+
 ## Platforms
 
 The plugin supports x64 and ia32 (32-bit x86) on Linux, macOS and Windows. SDK archives are named after the platform, for example `dartsdk-linux-x64-release.zip`.
@@ -53,11 +63,12 @@ The plugin supports x64 and ia32 (32-bit x86) on Linux, macOS and Windows. SDK a
 
 ## How it works
 
-The plugin reads version listings from the official Dart SDK archive on Google Cloud Storage. `Available` lists versions from the `stable`, `dev` and `beta` channels; `PreInstall` resolves a channel to its latest version (from `latest/VERSION`) or matches an exact version, then returns the SDK ZIP URL and its SHA-256 checksum from the archive's `.sha256sum` file; `EnvKeys` puts `<install-root>/bin` on `PATH`. `PostInstall` and `PreUse` do nothing. There is no Detect hook, legacy-file parsing or mirror support. See [development.md](docs/development.md).
+The plugin reads version listings from the official Dart SDK archive on Google Cloud Storage. `Available` lists versions from the `stable`, `dev` and `beta` channels; `PreInstall` resolves a channel to its latest version (from `latest/VERSION`) or matches an exact version, then returns the SDK ZIP URL and its SHA-256 checksum from the archive's `.sha256sum` file; `EnvKeys` puts `<install-root>/bin` on `PATH`. `Detect` finds Dart SDKs already on the machine for `vfox link --detect dart` (vfox 1.1.0+). `PostInstall` and `PreUse` do nothing. There is no legacy-file parsing or mirror support. See [development.md](docs/development.md).
 
 ## Documentation
 
 - [Versions and channels](docs/versions.md) — channels, exact versions, searching and uninstalling ([中文](docs/zh-CN/versions.md))
+- [Using SDKs already on the machine](docs/link.md) — adopt Dart SDKs found on this machine ([中文](docs/zh-CN/link.md))
 - [Platform support](docs/platforms.md) — supported OS and architecture combinations ([中文](docs/zh-CN/platforms.md))
 - [Install from source](docs/install-from-source.md) — build the plugin from a checkout ([中文](docs/zh-CN/install-from-source.md))
 - [Development](docs/development.md) — layout, hooks, contracts and tests ([中文](docs/zh-CN/development.md))

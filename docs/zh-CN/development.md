@@ -11,6 +11,7 @@ hooks/pre_install.lua           vfox install：解析渠道或确切版本，返
 hooks/post_install.lua          空操作
 hooks/pre_use.lua               空操作
 hooks/env_keys.lua              PATH = <安装根目录>/bin
+hooks/detect.lua                vfox link --detect dart：列出本机已有的 Dart SDK
 lib/util.lua                    归档地址、版本列表、校验和提取、平台映射
 tests/*_test.lua                离线钩子测试，由 vfox plugin test 运行
 tests/e2e/                      容器测试，见 e2e.md
@@ -26,13 +27,14 @@ opencode.jsonc                  让本仓库里的 OpenCode 智能体会话不�
 
 vfox 加载 `metadata.lua`，命令需要时调用相应的钩子，并向钩子提供全局变量 `PLUGIN` 和 `RUNTIME`（`osType`、`archType`、`version`）。`osType` 和 `archType` 来自 vfox 二进制的运行环境。
 
-插件只有一个上游：Google Cloud Storage 上的 Dart SDK 官方归档 `https://storage.googleapis.com/dart-archive/`。它没有 Detect 钩子，不解析旧版配置文件，不使用镜像，除了归档里 `.sha256sum` 文件中的 SHA-256 之外也没有别的校验算法。
+插件安装时只有一个上游：Google Cloud Storage 上的 Dart SDK 官方归档 `https://storage.googleapis.com/dart-archive/`。它不解析旧版配置文件，不使用镜像，除了归档里 `.sha256sum` 文件中的 SHA-256 之外也没有别的校验算法。可选的 Detect 钩子只读取本机已有的 SDK，不下载任何东西。
 
 ## 一条命令会执行什么
 
 | 你执行 | 调用的钩子 |
 | --- | --- |
 | `vfox search dart` | `Available` 列出 `stable`、`dev`、`beta` 三个渠道的版本，从新到旧 |
+| `vfox link --detect dart` | `Detect` 列出本机已有的 Dart SDK |
 | `vfox install dart@stable`（`@dev`、`@beta`） | `PreInstall` 读取 `latest/VERSION`，返回解析出的版本对应的地址和 sha256；vfox 下载解压后调用 `PostInstall`（空操作） |
 | `vfox install dart@3.14.0` | `PreInstall` 在 `Available` 里找到这个确切版本，返回其地址和 sha256；vfox 下载解压并调用 `PostInstall` |
 | `vfox use --global dart@stable`（或任意版本） | `PreUse`（空操作）；`EnvKeys` 提供 `PATH` |
@@ -44,6 +46,7 @@ vfox 加载 `metadata.lua`，命令需要时调用相应的钩子，并向钩子
 - **确切版本。** 确切版本必须出现在 `Available` 从三个渠道的 `channels/<channel>/release/` 前缀收集到的列表里，否则安装失败。安装后的名字就是这个确切版本。
 - **下载与校验。** SDK 是归档里的 `dartsdk-<os>-<arch>-release.zip`，用同名的 `.sha256sum` 文件校验。ZIP 里只有一个顶层 `dart-sdk/` 目录，vfox 会去掉它，所以安装根目录里是 `bin/dart`、`bin/dartaotruntime` 等。
 - **环境变量。** `EnvKeys` 在所有平台上返回 `PATH = <安装根目录>/bin`，不设置其他变量。
+- **Detect。** `Detect`（需要 vfox 1.1.0+）为 `vfox link --detect dart` 查找本机已有的 Dart SDK。只通过读文件来认定 SDK 主目录：`version` 文件里有一个可链接的版本号，且 `bin` 里有 `dart` 可执行文件（Windows 上是 `dart.exe`／`dart.bat`／`dart.cmd`）；绝不会执行 SDK 里的任何东西。返回的 `path` 就是 SDK 主目录本身——也正是 `EnvKeys` 收到的 `ctx.path`——所以 vfox 无需下载就能链接它。vfox 自己安装的内容会被排除，重复的路径和版本会被跳过，按优先级先匹配到的那条胜出。见 [link.md](link.md)。
 - **平台映射。** `darwin` 变成 `macos`；`linux` 和 `windows` 原样传递。`amd64` 变成 `x64`，`386` 变成 `ia32`。其他架构（例如 `arm64`）会让 `lib/util.lua` 调用 `error(...)`，因此不受支持。见 [platforms.md](platforms.md)。
 
 ## 测试
@@ -54,7 +57,7 @@ vfox 加载 `metadata.lua`，命令需要时调用相应的钩子，并向钩子
 vfox plugin test .
 ```
 
-测试文件先调用一次 `vfox.test` 里的 `test.load()`，再通过它返回的对象调用真正的钩子。HTTP 用假响应替身，所以不需要网络。vfox 会自动发现每个 `tests/**/*_test.lua`，新增测试文件不需要在任何地方登记。见 vfox 的[测试与调试插件](https://vfox.dev/zh-hans/plugins/create/testing.html)。
+测试文件先调用一次 `vfox.test` 里的 `test.load()`，再通过它返回的对象调用真正的钩子。HTTP 用假响应替身，所以不需要网络。`tests/detect_test.lua` 用替身的目录列表和版本文件覆盖检测逻辑（生效的 `DART_SDK`、`PATH`、Flutter 自带 SDK、asdf、mise、排除 vfox 自己安装的内容、损坏的目录，以及 Windows 上的 `dart.exe`）；在低于 1.1.0 的 vfox 上会跳过。vfox 会自动发现每个 `tests/**/*_test.lua`，新增测试文件不需要在任何地方登记。见 vfox 的[测试与调试插件](https://vfox.dev/zh-hans/plugins/create/testing.html)。
 
 `tests/e2e` 里的 Go 模块只依赖标准库；短模式会跳过容器套件，足够快，适合本地检查：
 
@@ -77,4 +80,4 @@ cd tests/e2e && go test -short ./...
 
 ## 编写文档
 
-英文页面在 `docs/`，中文页面在 `docs/zh-CN/` 下使用相同的文件名（中文 README 是 `README_CN.md`），每个页面开头都有到另一种语言的链接。新增页面要加进两份 README 的文档列表里。CI 不检查文档内容，所以你新增的命令要自己跑一遍确认。
+英文页面在 `docs/`，中文页面在 `docs/zh-CN/` 下使用相同的文件名（中文 README 是 `README_CN.md`），每个页面开头都有到另一种语言的链接。新增页面要加进两份 README 的文档列表里。各钩子的约定写在 [versions.md](versions.md)、[platforms.md](platforms.md) 和 [link.md](link.md)（Detect）里。CI 不检查文档内容，所以你新增的命令要自己跑一遍确认。

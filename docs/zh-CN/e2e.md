@@ -2,7 +2,7 @@
 
 [中文](e2e.md) | [English](../e2e.md)
 
-离线的 Lua 钩子测试（`tests/*_test.lua`，由 `vfox plugin test` 运行）在 **Test Plugin** 工作流里运行。端到端套件在容器里针对真实的 vfox 运行，覆盖 Linux 和 Windows；每个组合都有自己独立的一次性容器，由 Go 通过 Docker CLI 驱动。目标镜像（Linux 上是 Ubuntu，Windows 上是 Windows Server Core）里没有装 Dart，所以 Dart 只能来自 vfox 安装的内容。
+离线的 Lua 钩子测试（`tests/*_test.lua`，由 `vfox plugin test` 运行）在 **Test Plugin** 工作流里运行；其中包含 `tests/detect_test.lua`，它用替身的目录列表和版本文件检查 Detect 钩子，在低于 1.1.0 的 vfox 上会跳过。端到端套件在容器里针对真实的 vfox 运行，覆盖 Linux 和 Windows；每个组合都有自己独立的一次性容器，由 Go 通过 Docker CLI 驱动。目标镜像（Linux 上是 Ubuntu，Windows 上是 Windows Server Core）里没有装 Dart，所以安装出来的 Dart 只能来自 vfox 安装的内容；检测检查会另外准备一个独立的假 SDK。
 
 ## 前置条件
 
@@ -56,6 +56,7 @@ CI 使用 `go test -v -timeout 55m -run TestE2E ./windows`。
 6. `PATH` 指向已安装 SDK 的 `bin` 目录。
 7. `vfox current dart` 与使用中的版本一致。
 8. 一个明显不存在的版本会安装失败。
+9. 在 vfox 之外准备一个独立的假 SDK（Linux 上是 `/opt/fake-dart-sdk`，Windows 上是 `C:\fake-dart-sdk`），其中 `version` 文件写的是 `9.9.9`，`bin` 里有 `dart`（Windows 上是 `dart.exe`）。让 `DART_SDK` 指向它，运行 `vfox link --detect -y dart` 会链接到 9.9.9，该版本会出现在 `vfox list dart` 里（在 Linux 上还能从 `PATH` 直接运行）。
 
 ## CI 任务
 

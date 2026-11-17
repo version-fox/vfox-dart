@@ -2,7 +2,7 @@
 
 [中文](zh-CN/e2e.md) | [English](e2e.md)
 
-The offline Lua hook tests (`tests/*_test.lua` under `vfox plugin test`) run in the **Test Plugin** workflow. The end-to-end suite runs in containers against real vfox on Linux and Windows; each combination gets its own throwaway container, driven from Go through the Docker CLI. The target images — Ubuntu on Linux, Windows Server Core on Windows — carry no Dart, so Dart can only come from what vfox installs.
+The offline Lua hook tests (`tests/*_test.lua` under `vfox plugin test`) run in the **Test Plugin** workflow; these include `tests/detect_test.lua`, which checks the Detect hook with stubbed directory listings and version files and skips on vfox older than 1.1.0. The end-to-end suite runs in containers against real vfox on Linux and Windows; each combination gets its own throwaway container, driven from Go through the Docker CLI. The target images — Ubuntu on Linux, Windows Server Core on Windows — carry no Dart, so installed Dart can only come from what vfox installs; the detection check adds a standalone fake SDK of its own.
 
 ## Prerequisites
 
@@ -56,6 +56,7 @@ Each combination runs the same flow:
 6. `PATH` points at the installed SDK's `bin` directory.
 7. `vfox current dart` matches the version in use.
 8. An obviously missing version fails to install.
+9. A standalone fake SDK outside vfox (`/opt/fake-dart-sdk` on Linux, `C:\fake-dart-sdk` on Windows) has a `version` file of `9.9.9` and a `bin/dart` (`dart.exe` on Windows). With `DART_SDK` pointing at it, `vfox link --detect -y dart` links version 9.9.9, which then shows up in `vfox list dart` (and runs from `PATH` on Linux).
 
 ## CI jobs
 

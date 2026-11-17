@@ -88,6 +88,7 @@ func runOne(t *testing.T, image string, combo common.Combo) {
 	installDart(t, name, combo.Version)
 	useAndVerify(t, name, combo.Version)
 	checkMissingVersionRejected(t, name)
+	checkDetectAndLink(t, name)
 }
 
 // execRun runs a script through pwsh in the container and returns its exit
@@ -204,4 +205,25 @@ func checkMissingVersionRejected(t *testing.T, container string) {
 		t.Fatalf("an unpublished version must fail to install\n--- output ---\n%s", out)
 	}
 	t.Log("PASS an unpublished version is rejected")
+}
+
+// checkDetectAndLink adopts a Dart SDK outside vfox's directories through
+// `vfox link --detect -y`. The fake SDK only needs a version file and a
+// dart.exe for Detect and vfox's EnvKeys validation; it is not executed.
+func checkDetectAndLink(t *testing.T, container string) {
+	t.Helper()
+	script := `
+New-Item -ItemType Directory -Force -Path 'C:\fake-dart-sdk\bin' | Out-Null
+'9.9.9' | Set-Content 'C:\fake-dart-sdk\version'
+Copy-Item -Path 'C:\Windows\System32\cmd.exe' -Destination 'C:\fake-dart-sdk\bin\dart.exe'
+$env:DART_SDK = 'C:\fake-dart-sdk'
+$a = vfox activate pwsh | Out-String; if ($a.Trim()) { Invoke-Expression -Command $a }
+vfox link --detect -y dart
+vfox list dart
+`
+	out := execOK(t, container, script)
+	common.Contains(t, out, "Linked", "vfox link --detect links the SDK")
+	common.Contains(t, out, "9.9.9", "vfox list shows the linked version")
+	common.Contains(t, out, "linked", "vfox list marks the version as linked")
+	t.Log("PASS vfox link --detect adopted a Dart SDK already on the machine")
 }

@@ -39,6 +39,16 @@ vfox uninstall dart@3.14.0
 
 `vfox search dart` 会列出三个渠道里的所有版本，按从新到旧排列；每一条后面的备注就是它所属的渠道（`stable`、`dev` 或 `beta`）。详见 [docs/zh-CN/versions.md](docs/zh-CN/versions.md)。
 
+## 本机已有的 Dart SDK
+
+如果本机已经有 Dart SDK——手工解压的、Flutter 自带的，或者其他工具安装的——`vfox link --detect dart` 会找到它（需要 vfox 1.1.0 或更高版本）并直接链接，不用再下载一份。vfox 会列出找到的 SDK，让你选择链接哪个；`vfox link --detect -y dart` 会全部链接。vfox 里已经安装或链接过的版本会被跳过。
+
+```bash
+vfox link --detect dart
+```
+
+它会搜索哪些位置、以及怎样手动链接，见[使用本机已有的 SDK](docs/zh-CN/link.md)。
+
 ## 平台
 
 插件支持 Linux、macOS 和 Windows 上的 x64 与 ia32（32 位 x86）。SDK 压缩包按平台命名，例如 `dartsdk-linux-x64-release.zip`。
@@ -53,11 +63,12 @@ vfox uninstall dart@3.14.0
 
 ## 工作原理
 
-插件从 Google Cloud Storage 上的 Dart SDK 官方归档读取版本列表。`Available` 列出 `stable`、`dev` 和 `beta` 三个渠道的版本；`PreInstall` 把渠道名解析成最新版本（读取 `latest/VERSION`），或者匹配一个确切版本，然后返回 SDK 的 ZIP 地址和从归档里 `.sha256sum` 文件取出的 SHA-256 校验和；`EnvKeys` 把 `<安装根目录>/bin` 加到 `PATH` 上。`PostInstall` 和 `PreUse` 目前什么都不做。插件没有 Detect 钩子，也不解析旧版配置文件或使用镜像。详见 [docs/zh-CN/development.md](docs/zh-CN/development.md)。
+插件从 Google Cloud Storage 上的 Dart SDK 官方归档读取版本列表。`Available` 列出 `stable`、`dev` 和 `beta` 三个渠道的版本；`PreInstall` 把渠道名解析成最新版本（读取 `latest/VERSION`），或者匹配一个确切版本，然后返回 SDK 的 ZIP 地址和从归档里 `.sha256sum` 文件取出的 SHA-256 校验和；`EnvKeys` 把 `<安装根目录>/bin` 加到 `PATH` 上。`Detect` 为 `vfox link --detect dart` 查找本机已有的 Dart SDK（需要 vfox 1.1.0 或更高版本）。`PostInstall` 和 `PreUse` 目前什么都不做。插件不解析旧版配置文件，也不使用镜像。详见 [docs/zh-CN/development.md](docs/zh-CN/development.md)。
 
 ## 文档
 
 - [版本与渠道](docs/zh-CN/versions.md)：渠道、确切版本、搜索和卸载（[English](docs/versions.md)）
+- [使用本机已有的 SDK](docs/zh-CN/link.md)：采用本机上已有的 Dart SDK（[English](docs/link.md)）
 - [平台支持](docs/zh-CN/platforms.md)：支持的操作系统与架构组合（[English](docs/platforms.md)）
 - [从源码安装](docs/zh-CN/install-from-source.md)：从检出的代码构建插件（[English](docs/install-from-source.md)）
 - [开发](docs/zh-CN/development.md)：目录结构、钩子、约定和测试（[English](docs/development.md)）

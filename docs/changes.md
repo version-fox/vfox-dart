@@ -13,6 +13,8 @@ What changed in each release, as a user notices it.
 - Offline hook tests (`tests/*_test.lua`) run by `vfox plugin test .` in the **Test Plugin** workflow.
 - Linux and Windows container E2E suites (`tests/e2e/`) and the **E2E** workflow.
 - Repository infrastructure: `stylua.toml`, `.luarc.json`, `.gitattributes` (LF on all checkouts), `.dockerignore`, `.github/actionlint.yaml`, and `opencode.jsonc` (lets OpenCode agent sessions run `git push *`, `gh pr create *` and `gh pr comment *` without asking).
+- Detect Dart SDKs already on the machine through `vfox link --detect dart` (needs vfox 1.1.0), including Flutter's bundled SDK; `docs/link.md` documents it.
+- Offline Detect tests and detection checks in the Linux and Windows E2E suites.
 
 ## 0.1.1
 

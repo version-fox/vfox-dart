@@ -87,6 +87,7 @@ func runOne(t *testing.T, image string, combo common.Combo) {
 	installDart(t, name, combo.Version)
 	useAndVerify(t, name, combo.Version)
 	checkMissingVersionRejected(t, name)
+	checkDetectAndLink(t, name)
 }
 
 // execRun runs a script with bash -c in the container, returning its exit
@@ -207,4 +208,31 @@ func checkMissingVersionRejected(t *testing.T, container string) {
 		t.Fatalf("an unpublished version must fail to install\n--- output ---\n%s", out)
 	}
 	t.Log("PASS an unpublished version is rejected")
+}
+
+// checkDetectAndLink puts a standalone Dart SDK outside vfox's directories,
+// points DART_SDK at it and adopts it with `vfox link --detect -y`. The fake
+// SDK is deliberately simple: the Detect hook identifies it by its version
+// file and bin/dart, and vfox checks the same bin directory through EnvKeys.
+func checkDetectAndLink(t *testing.T, container string) {
+	t.Helper()
+	script := `set -euo pipefail
+mkdir -p /opt/fake-dart-sdk/bin
+printf '9.9.9\n' > /opt/fake-dart-sdk/version
+printf '#!/bin/sh\necho "Dart SDK version: 9.9.9 (stable) on test_x64"\n' > /opt/fake-dart-sdk/bin/dart
+chmod +x /opt/fake-dart-sdk/bin/dart
+export DART_SDK=/opt/fake-dart-sdk
+eval "$(vfox activate bash)"
+vfox link --detect -y dart
+vfox list dart
+vfox use --global dart@9.9.9
+eval "$(vfox activate bash)"
+dart --version
+`
+	out := execOK(t, container, script)
+	common.Contains(t, out, "Linked", "vfox link --detect links the SDK")
+	common.Contains(t, out, "9.9.9", "vfox list shows the linked version")
+	common.Contains(t, out, "linked", "vfox list marks the version as linked")
+	common.Contains(t, out, "Dart SDK version: 9.9.9", "the linked SDK runs from PATH")
+	t.Log("PASS vfox link --detect adopted a Dart SDK already on the machine")
 }
