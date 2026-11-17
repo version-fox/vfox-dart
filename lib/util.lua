@@ -1,16 +1,31 @@
+-- Copyright 2026 Han Li and contributors
+--
+-- Licensed under the Apache License, Version 2.0 (the "License");
+-- you may not use this file except in compliance with the License.
+-- You may obtain a copy of the License at
+--
+--   http://www.apache.org/licenses/LICENSE-2.0
+--
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
+
 local json = require("json")
 local http = require("http")
 local util = {}
 
 util.VersionURL =
-"https://storage.googleapis.com/storage/v1/b/dart-archive/o?delimiter=/&prefix=channels/%s/release/&alt=json"
+    "https://storage.googleapis.com/storage/v1/b/dart-archive/o?delimiter=/&prefix=channels/%s/release/&alt=json"
 util.DownloadURL = "https://storage.googleapis.com/dart-archive/channels/%s/release/%s/sdk/dartsdk-%s-%s-release.zip"
-util.SHA256URL = "https://storage.googleapis.com/dart-archive/channels/%s/release/%s/sdk/dartsdk-%s-%s-release.zip.sha256sum"
+util.SHA256URL =
+    "https://storage.googleapis.com/dart-archive/channels/%s/release/%s/sdk/dartsdk-%s-%s-release.zip.sha256sum"
 util.LatestVersionURL = "https://storage.googleapis.com/dart-archive/channels/%s/release/latest/VERSION"
 
 function util:extractChecksum(url)
     local resp, err = http.get({
-        url = url
+        url = url,
     })
     if err ~= nil or resp.status_code ~= 200 then
         error("get checksum failed" .. err)
@@ -22,7 +37,7 @@ end
 function util:parseReleases(devType, resultArr)
     local type = util:getOsTypeAndArch()
     local resp, err = http.get({
-        url = util.VersionURL:format(devType)
+        url = util.VersionURL:format(devType),
     })
     if err ~= nil or resp.status_code ~= 200 then
         error("get version failed" .. err)
@@ -63,7 +78,8 @@ function util:getOsTypeAndArch()
         error("dart does not support" .. RUNTIME.archType .. "architecture")
     end
     return {
-        osType = osType, archType = archType
+        osType = osType,
+        archType = archType,
     }
 end
 
