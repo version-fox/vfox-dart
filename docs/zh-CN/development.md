@@ -43,6 +43,7 @@ vfox 加载 `metadata.lua`，命令需要时调用相应的钩子，并向钩子
 ## 约定
 
 - **渠道别名解析。** 对 `stable`、`dev` 和 `beta`，`PreInstall` 读取 `channels/<channel>/release/latest/VERSION`，这是一个含 `date`、`version` 和 `revision` 三个字段的 JSON 对象，其中 `version` 作为安装的版本。渠道在安装时才解析。
+- **列表读取。** `Available` 会读取每个渠道 `channels/<channel>/release/` 列表的每一页，跟随 `nextPageToken`（归档每页最多返回 1000 个前缀），并按版本优先级排序。任何一次请求出现 HTTP 或传输错误都会让命令失败，绝不返回残缺的列表。
 - **确切版本。** 确切版本必须出现在 `Available` 从三个渠道的 `channels/<channel>/release/` 前缀收集到的列表里，否则安装失败。安装后的名字就是这个确切版本。
 - **下载与校验。** SDK 是归档里的 `dartsdk-<os>-<arch>-release.zip`，用同名的 `.sha256sum` 文件校验。ZIP 里只有一个顶层 `dart-sdk/` 目录，vfox 会去掉它，所以安装根目录里是 `bin/dart`、`bin/dartaotruntime` 等。
 - **环境变量。** `EnvKeys` 在所有平台上返回 `PATH = <安装根目录>/bin`，不设置其他变量。
@@ -57,7 +58,7 @@ vfox 加载 `metadata.lua`，命令需要时调用相应的钩子，并向钩子
 vfox plugin test .
 ```
 
-测试文件先调用一次 `vfox.test` 里的 `test.load()`，再通过它返回的对象调用真正的钩子。HTTP 用假响应替身，所以不需要网络。`tests/detect_test.lua` 用替身的目录列表和版本文件覆盖检测逻辑（生效的 `DART_SDK`、`PATH`、Flutter 自带 SDK、asdf、mise、排除 vfox 自己安装的内容、损坏的目录，以及 Windows 上的 `dart.exe`）；在低于 1.1.0 的 vfox 上会跳过。vfox 会自动发现每个 `tests/**/*_test.lua`，新增测试文件不需要在任何地方登记。见 vfox 的[测试与调试插件](https://vfox.dev/zh-hans/plugins/create/testing.html)。
+测试文件先调用一次 `vfox.test` 里的 `test.load()`，再通过它返回的对象调用真正的钩子。HTTP 用假响应替身，所以不需要网络。`tests/detect_test.lua` 用替身的目录列表和版本文件覆盖检测逻辑（生效的 `DART_SDK`、`PATH`、Flutter 自带 SDK、asdf、mise、排除 vfox 自己安装的内容、损坏的目录，以及 Windows 上的 `dart.exe`）；在低于 1.1.0 的 vfox 上会跳过。`tests/releases_test.lua` 覆盖版本列表：每一页都会读取，重复的 `nextPageToken` 会报错，失败的请求会报告所在步骤和 HTTP 状态。vfox 会自动发现每个 `tests/**/*_test.lua`，新增测试文件不需要在任何地方登记。见 vfox 的[测试与调试插件](https://vfox.dev/zh-hans/plugins/create/testing.html)。
 
 `tests/e2e` 里的 Go 模块只依赖标准库；短模式会跳过容器套件，足够快，适合本地检查：
 
@@ -69,7 +70,7 @@ cd tests/e2e && go test -short ./...
 
 ## 发布
 
-维护者在默认分支上从 **Actions → Plugin → Run workflow** 发布，填入不带 `v` 前缀的稳定插件版本号。共享的 [plugin-manifest-action](https://github.com/version-fox/plugin-manifest-action) 会更新 `metadata.lua`、创建版本提交和标签，并在这个仓库里发布 ZIP 和 manifest。不需要本地打标签，也不需要额外的发布令牌；拉取请求只运行检查。如果 `PLUGIN.version` 已经和标签一致，推送版本标签也能发布。如果发布失败，重新运行失败的任务即可续跑。包的约定和首次接入的要求见[共享工作流文档](https://github.com/version-fox/plugin-manifest-action)。
+维护者在默认分支上从 **Actions → Plugin → Run workflow** 发布，填入不带 `v` 前缀的稳定插件版本号。共享的 [plugin-manifest-action](https://github.com/version-fox/plugin-manifest-action) 会更新 `metadata.lua`、创建版本提交和标签，并在这个仓库里发布 ZIP 和 manifest。不需要本地打标签，也不需要额外的发布令牌；拉取请求只运行检查。如果 `PLUGIN.version` 已经和标签一致，推送版本标签也能发布。如果发布失败，重新运行失败的任务即可续跑。这套流程使用共享的 `@v1` 发布工具版本；更新这个工具本身不会发布本插件。包的约定和首次接入的要求见[共享工作流文档](https://github.com/version-fox/plugin-manifest-action)。发布之后，[vfox-plugins](https://github.com/version-fox/vfox-plugins) 里的 `plugins/dart.json` 会显示新版本。
 
 ## 编写文档
 

@@ -22,7 +22,7 @@ dart --version
 There are three release channels: `stable`, `dev` and `beta`. A channel name installs the newest version published on that channel:
 
 ```bash
-vfox install dart@stable      # newest stable, 3.14.0 released 2026-11-04
+vfox install dart@stable      # newest stable
 vfox install dart@dev         # newest dev build
 vfox install dart@beta        # newest beta build
 ```
@@ -71,15 +71,13 @@ The plugin reads version listings from the official Dart SDK archive on Google C
 - [Using SDKs already on the machine](docs/link.md) — adopt Dart SDKs found on this machine ([中文](docs/zh-CN/link.md))
 - [Platform support](docs/platforms.md) — supported OS and architecture combinations ([中文](docs/zh-CN/platforms.md))
 - [Install from source](docs/install-from-source.md) — build the plugin from a checkout ([中文](docs/zh-CN/install-from-source.md))
-- [Development](docs/development.md) — layout, hooks, contracts and tests ([中文](docs/zh-CN/development.md))
+- [Development](docs/development.md) — layout, hooks, contracts, tests and releasing ([中文](docs/zh-CN/development.md))
 - [E2E tests](docs/e2e.md) — the Linux and Windows container suites ([中文](docs/zh-CN/e2e.md))
 - [Changes](docs/changes.md) — changelog ([中文](docs/zh-CN/changes.md))
 
 ## Releasing this plugin
 
-Maintainers publish from **Actions → Plugin → Run workflow** on the default branch, entering a stable plugin version without the `v` prefix. The shared [plugin-manifest-action](https://github.com/version-fox/plugin-manifest-action) updates `metadata.lua`, creates the version commit and tag, and publishes the ZIP and manifest in this repository. No local tag or extra release token is needed. Pull requests run checks only; PR titles no longer trigger publication.
-
-Existing version-tag pushes are supported when `PLUGIN.version` already matches the tag. If publication fails, re-run the original failed job to resume it. The workflow follows the shared `@v1` release-tool version; updating the tool does not release this plugin. See the [shared workflow documentation](https://github.com/version-fox/plugin-manifest-action) for the package contract and first-rollout requirements. After a release, `plugins/dart.json` in [vfox-plugins](https://github.com/version-fox/vfox-plugins) shows the new version.
+Maintainers release from the **Plugin** workflow. The steps and the details are in [development.md → Releasing](docs/development.md#releasing).
 
 ## Thanks and links
 

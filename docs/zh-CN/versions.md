@@ -18,13 +18,13 @@ vfox install dart@beta
 
 ```json
 {
-  "date": "2026-11-04",
-  "version": "3.14.0",
-  "revision": "a1b2c3d4e5"
+  "date": "2026-11-17",
+  "version": "3.14.1",
+  "revision": "c8a0db5978a68d4037f7e5294ffc79867935c8c2"
 }
 ```
 
-其中 `version` 是安装的值，`date` 是发布日期，`revision` 是上游的修订号。例如，截至 2026-11-17，最新的 stable 是 **3.14.0**，发布于 **2026-11-04**。渠道在安装时才解析，所以以后再次安装 `@stable` 可能会装上更新的版本；安装后的 SDK 以解析出的版本号命名。
+其中 `version` 是安装的值，`date` 是发布日期，`revision` 是上游的修订号。例如，截至 2026-11-18，最新的 stable 是 **3.14.1**，发布于 **2026-11-17**。渠道在安装时才解析，所以以后再次安装 `@stable` 可能会装上更新的版本；安装后的 SDK 以解析出的版本号命名。
 
 ## 确切版本
 
@@ -48,9 +48,9 @@ vfox search dart
 ```
 $ vfox search dart
 Available versions:
-  - 3.14.0 (stable)
-  - 3.14.0 (dev)
-  - 3.13.0 (beta)
+  - 3.15.0-148.0.dev (dev)
+  - 3.15.0-118.1.beta (beta)
+  - 3.14.1 (stable)
   ...
 ```
 

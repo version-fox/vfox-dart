@@ -22,7 +22,7 @@ dart --version
 共有三个发布渠道：`stable`、`dev` 和 `beta`。写渠道名会安装该渠道上最新的版本：
 
 ```bash
-vfox install dart@stable      # 最新的 stable，3.14.0，发布于 2026-11-04
+vfox install dart@stable      # 最新的 stable
 vfox install dart@dev         # 最新的 dev 构建
 vfox install dart@beta        # 最新的 beta 构建
 ```
@@ -71,15 +71,13 @@ vfox link --detect dart
 - [使用本机已有的 SDK](docs/zh-CN/link.md)：采用本机上已有的 Dart SDK（[English](docs/link.md)）
 - [平台支持](docs/zh-CN/platforms.md)：支持的操作系统与架构组合（[English](docs/platforms.md)）
 - [从源码安装](docs/zh-CN/install-from-source.md)：从检出的代码构建插件（[English](docs/install-from-source.md)）
-- [开发](docs/zh-CN/development.md)：目录结构、钩子、约定和测试（[English](docs/development.md)）
+- [开发](docs/zh-CN/development.md)：目录结构、钩子、约定、测试和发布（[English](docs/development.md)）
 - [E2E 测试](docs/zh-CN/e2e.md)：Linux 与 Windows 容器测试套件（[English](docs/e2e.md)）
 - [变更记录](docs/zh-CN/changes.md)：更新日志（[English](docs/changes.md)）
 
 ## 发布这个插件
 
-维护者在默认分支上从 **Actions → Plugin → Run workflow** 发布，填入不带 `v` 前缀的稳定插件版本号。共享的 [plugin-manifest-action](https://github.com/version-fox/plugin-manifest-action) 会更新 `metadata.lua`、创建版本提交和标签，并在这个仓库里发布 ZIP 和 manifest。不需要本地打标签，也不需要额外的发布令牌。拉取请求只运行检查；PR 标题不再触发发布。
-
-如果 `PLUGIN.version` 已经和标签一致，推送已有的版本标签也能发布。如果发布失败，重新运行原来失败的任务即可续跑。这套流程使用共享的 `@v1` 发布工具版本；更新这个工具本身不会发布本插件。包的约定和首次接入的要求见[共享工作流文档](https://github.com/version-fox/plugin-manifest-action)。发布之后，[vfox-plugins](https://github.com/version-fox/vfox-plugins) 里的 `plugins/dart.json` 会显示新版本。
+维护者通过 **Plugin** 工作流发布。步骤和细节见[开发文档的发布一节](docs/zh-CN/development.md#发布)。
 
 ## 致谢与链接
 

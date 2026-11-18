@@ -48,7 +48,7 @@ CI 使用 `go test -v -timeout 55m -run TestE2E ./windows`。
 
 每个组合都运行同样的流程：
 
-1. 从固定版本安装 vfox，并从当前检出注册本地的 `dart` 插件。
+1. 从 `VFOX_VERSION` 指定的版本安装 vfox（默认是 vfox 的最新发布版），并从当前检出注册本地的 `dart` 插件。
 2. `vfox info dart` 打印的 Notes 里有指向 README 的链接。
 3. `vfox search dart` 能列出版本。
 4. 安装一个固定的确切版本（`DART_VERSION`，默认 3.14.0）。

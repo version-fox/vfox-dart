@@ -23,7 +23,7 @@ A directory counts as a Dart SDK home when its `version` file names a linkable v
 - The `DART_SDK` and `DART_HOME` environment variables.
 - Flutter's bundled SDK (`FLUTTER_HOME/bin/cache/dart-sdk`), plus Flutter roots found on `PATH` (`.../bin/cache/dart-sdk`).
 - Every `PATH` entry: a trailing `.../bin` is stripped to check the SDK home, and a Flutter `.../bin/cache/dart-sdk` there is checked too.
-- asdf (`$ASDF_DATA_DIR/installs/dart`, default `~/.asdf/installs/dart`) and mise (`$MISE_DATA_DIR/installs/dart`, default `~/.local/share/mise/installs/dart`, plus `%LOCALAPPDATA%\mise\installs\dart` on Windows).
+- asdf (`$ASDF_DATA_DIR/installs/dart`, default `~/.asdf/installs/dart`) and mise (`$MISE_DATA_DIR/installs/dart`, default `$XDG_DATA_HOME/mise/installs/dart` when `XDG_DATA_HOME` is set and `~/.local/share/mise/installs/dart` otherwise; on Windows also `%LOCALAPPDATA%\mise\installs\dart`).
 - On Windows: Scoop (`~/scoop/apps/dart-sdk/current`), the children of `Program Files\Dart`, and Chocolatey (`%ProgramData%\chocolatey\lib\dart-sdk\tools`).
 - On Unix: `/usr/lib/dart`, `/opt/dart-sdk`, `~/dart-sdk`, the Flutter roots `~/flutter`, `/opt/flutter` and `/usr/local/flutter`, Homebrew (`/opt/homebrew/opt/dart/libexec`, `/usr/local/opt/dart/libexec` and their Cellar versions), and `/opt/dart*`.
 

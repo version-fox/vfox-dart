@@ -18,13 +18,13 @@ vfox install dart@beta
 
 ```json
 {
-  "date": "2026-11-04",
-  "version": "3.14.0",
-  "revision": "a1b2c3d4e5"
+  "date": "2026-11-17",
+  "version": "3.14.1",
+  "revision": "c8a0db5978a68d4037f7e5294ffc79867935c8c2"
 }
 ```
 
-`version` is the value installed; `date` is the release date and `revision` the upstream revision. For example, the latest stable as of 2026-11-17 is **3.14.0**, released **2026-11-04**. A channel is resolved at install time, so installing `@stable` again later can pick up a newer version; the SDK is then stored under that resolved version number.
+`version` is the value installed; `date` is the release date and `revision` the upstream revision. For example, as of 2026-11-18 the latest stable is **3.14.1**, released **2026-11-17**. A channel is resolved at install time, so installing `@stable` again later can pick up a newer version; the SDK is then stored under that resolved version number.
 
 ## Exact versions
 
@@ -48,9 +48,9 @@ vfox search dart
 ```
 $ vfox search dart
 Available versions:
-  - 3.14.0 (stable)
-  - 3.14.0 (dev)
-  - 3.13.0 (beta)
+  - 3.15.0-148.0.dev (dev)
+  - 3.15.0-118.1.beta (beta)
+  - 3.14.1 (stable)
   ...
 ```
 

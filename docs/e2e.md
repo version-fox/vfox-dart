@@ -48,7 +48,7 @@ CI uses `go test -v -timeout 55m -run TestE2E ./windows`.
 
 Each combination runs the same flow:
 
-1. vfox is installed from the pinned release and the local `dart` plugin is registered from this checkout.
+1. vfox is installed from the release named by `VFOX_VERSION` (default: the latest vfox release), and the local `dart` plugin is registered from this checkout.
 2. `vfox info dart` prints notes that link to the README.
 3. `vfox search dart` lists versions.
 4. A pinned exact version (`DART_VERSION`, default 3.14.0) installs.
