@@ -14,6 +14,6 @@ The supported combinations are therefore Linux, macOS and Windows on x64 or ia32
 
 ## arm64 is not supported
 
-Only `amd64` and `386` are mapped in `lib/util.lua`. For any other architecture — including `arm64` on Apple silicon, ARM Windows or ARM Linux — the mapping calls Lua's `error(...)` with a message naming the architecture (for example `dart does not supportarm64architecture`). As a result `vfox search` and `vfox install` fail on those platforms instead of installing an SDK that does not match. There is no arm64 build support, fallback or emulation in this plugin.
+Only `amd64` and `386` are mapped in `lib/util.lua`. For any other architecture — including `arm64` on Apple silicon, ARM Windows or ARM Linux — the mapping calls Lua's `error(...)` with a message naming the architecture (for example `dart does not support arm64 architecture`). As a result `vfox search` and `vfox install` fail on those platforms instead of installing an SDK that does not match. There is no arm64 build support, fallback or emulation in this plugin.
 
 See [development.md](development.md) for the mapping in the code and [versions.md](versions.md) for how versions are chosen within a supported platform.

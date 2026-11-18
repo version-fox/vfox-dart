@@ -27,32 +27,69 @@ function util:extractChecksum(url)
     local resp, err = http.get({
         url = url,
     })
-    if err ~= nil or resp.status_code ~= 200 then
-        error("get checksum failed" .. err)
+    if err ~= nil then
+        error("get checksum failed: " .. err)
+    end
+    if resp.status_code ~= 200 then
+        error("get checksum failed: HTTP " .. tostring(resp.status_code))
     end
     local checksum = resp.body:match("^(%w+)%s")
     return checksum
 end
 
+--- Percent-encodes a value for a query string. Page tokens are opaque and can
+--- contain characters such as "+", "/" or "=".
+local function encodeQueryValue(value)
+    local encoded = value:gsub("[^%w%-%._~]", function(c)
+        return string.format("%%%02X", c:byte())
+    end)
+    return encoded
+end
+
+--- Adds the versions of one channel to resultArr. The listing returns at most
+--- 1000 prefixes per page and a nextPageToken while more pages follow, so every
+--- page is requested until a response has no token.
 function util:parseReleases(devType, resultArr)
     local type = util:getOsTypeAndArch()
-    local resp, err = http.get({
-        url = util.VersionURL:format(devType),
-    })
-    if err ~= nil or resp.status_code ~= 200 then
-        error("get version failed" .. err)
-    end
-    local body = json.decode(resp.body)
-    for _, info in ipairs(body.prefixes) do
-        local version = util:extractVersions(info)
-        if version ~= nil then
-            table.insert(resultArr, {
-                version = version,
-                url = util.DownloadURL:format(devType, version, type.osType, type.archType),
-                sha256 = util.SHA256URL:format(devType, version, type.osType, type.archType),
-                note = devType,
-            })
+    local seenTokens = {}
+    local pageToken = nil
+    while true do
+        local url = util.VersionURL:format(devType)
+        if pageToken ~= nil then
+            url = url .. "&pageToken=" .. encodeQueryValue(pageToken)
         end
+        local resp, err = http.get({
+            url = url,
+        })
+        if err ~= nil then
+            error("get version failed: " .. err)
+        end
+        if resp.status_code ~= 200 then
+            error("get version failed: HTTP " .. tostring(resp.status_code))
+        end
+        local body = json.decode(resp.body)
+        -- A page may have no prefixes field at all; it is then just empty.
+        for _, info in ipairs(body.prefixes or {}) do
+            local version = util:extractVersions(info)
+            if version ~= nil then
+                table.insert(resultArr, {
+                    version = version,
+                    url = util.DownloadURL:format(devType, version, type.osType, type.archType),
+                    sha256 = util.SHA256URL:format(devType, version, type.osType, type.archType),
+                    note = devType,
+                })
+            end
+        end
+        local nextToken = body.nextPageToken
+        if nextToken == nil or nextToken == "" then
+            return
+        end
+        -- A token that comes back again would make this loop run forever.
+        if seenTokens[nextToken] then
+            error("list versions failed: nextPageToken repeated for " .. devType)
+        end
+        seenTokens[nextToken] = true
+        pageToken = nextToken
     end
 end
 
@@ -144,7 +181,7 @@ function util:getOsTypeAndArch()
     elseif RUNTIME.archType == "386" then
         archType = "ia32"
     else
-        error("dart does not support" .. RUNTIME.archType .. "architecture")
+        error("dart does not support " .. RUNTIME.archType .. " architecture")
     end
     return {
         osType = osType,

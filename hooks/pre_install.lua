@@ -26,8 +26,11 @@ function PLUGIN:PreInstall(ctx)
         local resp, err = http.get({
             url = util.LatestVersionURL:format(arg),
         })
-        if err ~= nil or resp.status_code ~= 200 then
-            error("get version failed" .. err)
+        if err ~= nil then
+            error("get version failed: " .. err)
+        end
+        if resp.status_code ~= 200 then
+            error("get version failed: HTTP " .. tostring(resp.status_code))
         end
         local latestVersion = json.decode(resp.body)
         local version = latestVersion.version

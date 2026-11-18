@@ -4,6 +4,12 @@
 
 What changed in each release, as a user notices it.
 
+## Unreleased
+
+- The channel version list is read to its last page. Before, a version listed after the first 1000 entries of a channel was silently missing from `vfox search` and `vfox install`. No version is missing today.
+- A failed request for a version list, a channel's latest version or a checksum now reports the HTTP status (for example `get version failed: HTTP 503`) or the transport error, instead of failing with a Lua error about a nil value.
+- The error for an unsupported architecture now reads `dart does not support arm64 architecture`.
+
 ## 0.1.2 (2026-11-17)
 
 - Sort available versions by numeric precedence instead of string order, so `3.14.0` is listed before `3.9.4`. This also fixes `vfox install dart@latest` on vfox versions that resolve `@latest` from `Available`: it now picks the highest version by precedence instead of a lexicographic artifact such as `3.9.4`. For the newest stable build, use `dart@stable`.
