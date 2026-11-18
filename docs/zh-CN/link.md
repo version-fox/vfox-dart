@@ -23,7 +23,7 @@ vfox link --detect -y dart
 - `DART_SDK` 和 `DART_HOME` 环境变量。
 - Flutter 自带的 SDK（`FLUTTER_HOME/bin/cache/dart-sdk`），以及 `PATH` 上 Flutter 目录中的 SDK（`.../bin/cache/dart-sdk`）。
 - `PATH` 里的每一项：结尾是 `.../bin` 时会去掉 `bin` 再检查 SDK 主目录，同时也会检查那里的 Flutter `.../bin/cache/dart-sdk`。
-- asdf（`${ASDF_DATA_DIR}/installs/dart`，默认 `~/.asdf/installs/dart`）和 mise（`${MISE_DATA_DIR}/installs/dart`，默认 `~/.local/share/mise/installs/dart`；Windows 上还有 `%LOCALAPPDATA%\mise\installs\dart`）。
+- asdf（`${ASDF_DATA_DIR}/installs/dart`，默认 `~/.asdf/installs/dart`）和 mise（`${MISE_DATA_DIR}/installs/dart`，默认在设置了 `XDG_DATA_HOME` 时为 `${XDG_DATA_HOME}/mise/installs/dart`，否则为 `~/.local/share/mise/installs/dart`；Windows 上还有 `%LOCALAPPDATA%\mise\installs\dart`）。
 - Windows 上还有：Scoop（`~/scoop/apps/dart-sdk/current`）、`Program Files\Dart` 下的子目录，以及 Chocolatey（`%ProgramData%\chocolatey\lib\dart-sdk\tools`）。
 - Unix 上还有：`/usr/lib/dart`、`/opt/dart-sdk`、`~/dart-sdk`，常见 Flutter 根目录 `~/flutter`、`/opt/flutter`、`/usr/local/flutter`，Homebrew（`/opt/homebrew/opt/dart/libexec`、`/usr/local/opt/dart/libexec` 及其 Cellar 版本），以及 `/opt/dart*`。
 

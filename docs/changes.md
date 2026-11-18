@@ -4,9 +4,9 @@
 
 What changed in each release, as a user notices it.
 
-## Unreleased
+## 0.1.3 (2026-11-18)
 
-- The channel version list is read to its last page. Before, a version listed after the first 1000 entries of a channel was silently missing from `vfox search` and `vfox install`. No version is missing today.
+- The channel version list is read to its last page. Before, a version listed after the first 1000 entries of a channel was silently missing from `vfox search` and `vfox install`. In practice, no version was missing.
 - A failed request for a version list, a channel's latest version or a checksum now reports the HTTP status (for example `get version failed: HTTP 503`) or the transport error, instead of failing with a Lua error about a nil value.
 - The error for an unsupported architecture now reads `dart does not support arm64 architecture`.
 
